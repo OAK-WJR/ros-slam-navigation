@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<robot name="my_car_camera" xmlns:xacro="http://wiki.ros.org/xacro">
+    <xacro:include filename="/home/jetson/sim/src/myrobot/urdf/inertial.xacro" />
+    <xacro:include filename="/home/jetson/sim/src/myrobot/urdf/base.xacro" />
+    <xacro:include filename="/home/jetson/sim/src/myrobot/urdf/camera.xacro" />
+    <xacro:include filename="/home/jetson/sim/src/myrobot/urdf/laser.xacro" />
+</robot>
