@@ -34,3 +34,9 @@ Thumbs.db
 # 大文件（根据实际情况调整）
 # *.pbstream  # 如果地图文件很大，可以取消注释这行
 
+# 超过 GitHub 限制的大文件
+*.dmg
+**/Downloads/**
+src/my_navigation/Downloads/
+src_past/my_navigation/Downloads/
+
