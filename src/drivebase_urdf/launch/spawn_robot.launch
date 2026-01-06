@@ -1,0 +1,32 @@
+<launch>
+  <!-- 使用 Gazebo 物理引擎 -->
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+
+  <!-- 启动 Gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+  </include>
+
+  <!-- 加载机器人 URDF -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find drivebase_urdf)/urdf/drivebase.urdf'" />
+
+  <!-- 生成机器人 TF 变换 -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+  <!-- 在 Gazebo 中生成机器人 -->
+  <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model drivebase" />
+
+  <!-- 里程计 TF -->
+  <node pkg="tf" type="static_transform_publisher" name="odom_tf"
+        args="0 0 0 0 0 0 odom base_link 100" />
+
+  <!-- 里程计滤波 (可选) -->
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization">
+    <rosparam command="load" file="$(find drivebase_urdf)/config/ekf.yaml"/>
+  </node>
+
+</launch>

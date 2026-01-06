@@ -1,0 +1,31 @@
+<launch>
+  <!-- 关闭仿真时间 -->
+  <param name="/use_sim_time" value="false" />
+
+  <!-- 启动地图服务器 -->
+  <include file="$(find my_navigation)/launch/map_server.launch" />
+
+  <!-- 发布机器人信息 -->
+  <param name="robot_description" textfile="$(find drivebase_urdf)/urdf/drivebase_urdf.urdf" />
+  <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- 启动雷达 -->
+  <include file="$(find rplidar_ros)/launch/rplidar_s2.launch" />
+
+  <!-- 启动 TF 变换 -->
+  <node pkg="tf" type="static_transform_publisher" name="tf_map_to_base_link"
+        args="0 0 0 0 0 0 1 map base_link 10" />
+  
+  <node pkg="tf" type="static_transform_publisher" name="tf_base_link_to_odom"
+        args="0 0 0 0 0 0 1 base_link odom 10" />
+  <!-- 载入 Move Base -->
+  <include file="$(find my_navigation)/launch/move_base.launch" />
+
+  <!-- 加载目标点管理 -->
+  <node pkg="my_navigation" type="interactive_goal_marker.py" name="interactive_goal_marker" output="screen" />
+
+  <!-- 启动 RViz -->
+  <node name="rviz" pkg="rviz" type="rviz"
+        args="-d $(find my_navigation)/config/rviz_config.rviz" />
+</launch>

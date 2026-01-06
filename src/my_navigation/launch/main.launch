@@ -1,0 +1,20 @@
+<launch>
+  <!-- 启动机器人控制相关节点 -->
+  <include file="$(find my_navigation)/launch/robot_control.launch" />
+
+  <!-- 启动差分驱动控制 -->
+  <!-- <include file="$(find my_navigation)/launch/diff_drive.launch" /> -->
+
+  <!-- 启动 RPLIDAR A1 -->
+  <!-- <include file="$(find rplidar_ros)/launch/rplidar_a1.launch" /> -->
+
+  <!-- 启动自定义的里程计发布节点 -->
+  <node pkg="my_navigation" type="diffdrive_odom_publisher.py" name="diffdrive_odom_publisher" output="screen" />
+
+  <!-- 等待5秒 -->
+  <arg name="wait_time" value="5"/>
+  <node pkg="my_navigation" type="wait_node.py" name="wait_node" args="$(arg wait_time)" output="screen"/>
+
+  <!-- 启动机器人控制节点 -->
+  <node pkg="my_navigation" type="robotControll.py" name="robotControll" output="screen" />
+</launch>

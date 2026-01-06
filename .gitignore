@@ -1,0 +1,36 @@
+# ROS/Catkin 工作空间
+build/
+devel/
+install/
+.catkin_workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日志文件
+*.log
+build_log.txt
+
+# 临时文件
+*.tmp
+*.bak
+*.cache
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 大文件（根据实际情况调整）
+# *.pbstream  # 如果地图文件很大，可以取消注释这行
+

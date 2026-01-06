@@ -1,0 +1,7 @@
+analyzers:
+  tf:
+    type: diagnostic_aggregator/GenericAnalyzer
+    path: TF
+    timeout: 5.0
+    contains: ['tf']
+    num_items: 3 

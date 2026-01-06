@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="MainTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="MainTree">
+        <SequenceStar name="Auto">
+            <SetBlackboard output_key="target" value="Point1"/>
+            <Action ID="MoveToGoal" goal="{target}"/>
+            <SubTree ID="PutCoral"/>
+            <Fallback name="PickCoral">
+                <Sequence name="SuccessPath">
+                    <SetBlackboard output_key="target" value="Point2"/>
+                    <Action ID="MoveToGoal" goal="{target}"/>
+                </Sequence>
+                <Sequence name="FailurePath">
+                    <Action ID="PickCoral"/>
+                    <SetBlackboard output_key="target" value="Point3"/>
+                    <Action ID="MoveToGoal" goal="{target}"/>
+                </Sequence>
+            </Fallback>
+        </SequenceStar>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="PutCoral">
+        <Sequence name="PutCoral">
+            <RetryUntilSuccessful num_attempts="3">
+                <Action ID="AutoLineUp" goal="{target}"/>
+            </RetryUntilSuccessful>
+            <Action ID="PlaceCoral" level="4"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="AutoLineUp">
+            <input_port name="goal"/>
+        </Action>
+        <Action ID="MoveToGoal">
+            <input_port name="goal"/>
+        </Action>
+        <Action ID="PickCoral"/>
+        <Action ID="PlaceCoral">
+            <input_port name="level"/>
+        </Action>
+        <SubTree ID="PutCoral"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>

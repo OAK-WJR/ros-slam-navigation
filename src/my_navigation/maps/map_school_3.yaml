@@ -1,0 +1,6 @@
+image: /root/catkin_ws/src/my_navigation/maps/map_school_3.pgm
+resolution: 0.05
+origin: [-10.0105, -6.0803, 0.0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196

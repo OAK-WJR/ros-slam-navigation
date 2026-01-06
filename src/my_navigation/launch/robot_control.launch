@@ -1,0 +1,22 @@
+<launch>
+  <!-- 1. Run serial_port_path_detect.py and joint_states_publisher.py in parallel -->
+  <node pkg="my_navigation" type="serial_port_path_detect.py" name="serial_port_path_detect" output="screen" required="false"/>
+
+  <node pkg="my_navigation" type="joint_states_publisher.py" name="joint_states_publisher" output="screen"/>
+
+  <!-- 2. Run raw_pwm.py -->
+  <node pkg="my_navigation" type="raw_pwm.py" name="raw_pwm" output="screen" />
+
+  <!-- 3. Run calibration_node.py, based on user choice -->
+  <arg name="c" default="false"/>
+  <node if="$(arg c)"
+        pkg="my_navigation" type="calibration_node.py"
+        name="calibration_node" output="screen"/>
+
+  <!-- 4. Run motor_control_node.py -->
+  <!--
+  <node pkg="my_navigation" type="motor_control_node.py" name="motor_control_node" output="screen">
+    <param name="run_calibration" value="$(arg run_calibration)"/>
+  </node>
+  -->
+</launch>

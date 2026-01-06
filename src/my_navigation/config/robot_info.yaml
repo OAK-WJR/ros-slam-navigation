@@ -1,0 +1,5 @@
+arduino:
+  serial_port: /dev/ttyACM0
+motor_control_node:
+  pwm_center_left: 1525
+  pwm_center_right: 1545

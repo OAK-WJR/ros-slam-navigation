@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <SequenceStar name="Auto">
+            <SetBlackboard name="SetGoal" output_key="goal" value="1"/>
+            <SetBlackboard output_key="speed" value="50"/>
+            <SetBlackboard output_key="GP" value="coral"/>
+            <SetBlackboard name="SetLevel" output_key="level" value="4"/>
+            <Fallback>
+                <SubTree ID="MoveAndSetPose"/>
+                <SubTree ID="PutGP"/>
+            </Fallback>
+            <Repeat num_cycles="3">
+                <SequenceStar>
+                    <Action ID="IncrementVariable" variable="{goal}"/>
+                    <SetBlackboard output_key="level" value="0"/>
+                    <SubTree ID="MoveAndSetPose"/>
+                    <Sequence name="GetGP">
+                        <RetryUntilSuccessful num_attempts="3">
+                            <Action ID="AutoLineUp" goal="{goal}"/>
+                        </RetryUntilSuccessful>
+                        <Action GP="{GP}" ID="IntakeGP" way="{way}"/>
+                    </Sequence>
+                    <Parallel failure_threshold="1" success_threshold="3">
+                        <Action ID="MoveToGoal" goal="1" speed="{speed}"/>
+                    </Parallel>
+                </SequenceStar>
+            </Repeat>
+        </SequenceStar>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="MoveAndSetPose">
+        <SequenceStar name="MoveAndSetPose">
+            <Parallel failure_threshold="1" success_threshold="3">
+                <Action ID="MoveToGoal" goal="{goal}" speed="{speed}"/>
+                <Action GP="{GP}" ID="SetPose" level="{level}" part="arm"/>
+                <Action GP="{GP}" ID="SetPose" level="{level}" part="elevator"/>
+            </Parallel>
+        </SequenceStar>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="PutGP">
+        <Sequence name="PutGP">
+            <RetryUntilSuccessful num_attempts="3">
+                <Action ID="AutoLineUp" goal="{goal}"/>
+            </RetryUntilSuccessful>
+            <Action GP="{GP}" ID="LaunchGP" level="{level}"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="AutoLineUp">
+            <input_port name="goal"/>
+        </Action>
+        <Action ID="IncrementVariable">
+            <inout_port name="variable"/>
+        </Action>
+        <Action ID="IntakeGP">
+            <input_port name="GP"/>
+            <input_port name="way"/>
+        </Action>
+        <Action ID="LaunchGP">
+            <input_port default="coral" name="GP">coral / algae</input_port>
+            <input_port default="1" name="level"/>
+        </Action>
+        <SubTree ID="MoveAndSetPose"/>
+        <Action ID="MoveToGoal">
+            <input_port default="1" name="goal"/>
+            <input_port default="50" name="speed"/>
+        </Action>
+        <SubTree ID="PutGP"/>
+        <Action ID="SetPose">
+            <input_port name="GP"/>
+            <input_port name="level"/>
+            <input_port name="part">arm / elevator / coral intake</input_port>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>

@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="drivebase_urdf">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.0360174917610661 -0.033483194943851 0.0197097274220882"
+        rpy="0 0 0" />
+      <mass
+        value="3.22411510404446" />
+      <inertia
+        ixx="0.0555218619381839"
+        ixy="-1.0020503088782E-05"
+        ixz="-1.10065226419042E-05"
+        iyy="0.0436638429331786"
+        iyz="-6.88955078235703E-07"
+        izz="0.0984047322506292" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="lf_steer_link">
+    <inertial>
+      <origin
+        xyz="0.000360652951220702 -0.000188857174773571 -0.0220003559358373"
+        rpy="0 0 0" />
+      <mass
+        value="0.0958737115493749" />
+      <inertia
+        ixx="5.01935779175315E-05"
+        ixy="-2.22869909553939E-06"
+        ixz="1.9496081337501E-07"
+        iyy="4.71024622337023E-05"
+        iyz="-1.01947031678402E-07"
+        izz="7.72959084714181E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/lf_steer_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/lf_steer_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="lf_steer_joint"
+    type="continuous">
+    <origin
+      xyz="0.271475382664597 0.296038980276505 0.074707"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="lf_steer_link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="lf_wheel_link">
+    <inertial>
+      <origin
+        xyz="0.000103321211615159 7.37785730085235E-05 0.000290096982048488"
+        rpy="0 0 0" />
+      <mass
+        value="0.112258355026833" />
+      <inertia
+        ixx="0.000103391197775288"
+        ixy="-1.67096741507407E-07"
+        ixz="-1.10244750250141E-08"
+        iyy="0.000103505462722461"
+        iyz="-7.93229634724504E-09"
+        izz="0.000174973978897935" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/lf_wheel_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/lf_wheel_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="lf_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="0 0 -0.0684135000000001"
+      rpy="1.5707963267949 0 1.08856746954429" />
+    <parent
+      link="lf_steer_link" />
+    <child
+      link="lf_wheel_link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rf_steer_link">
+    <inertial>
+      <origin
+        xyz="0.000360664159171104 -0.000188728899294367 -0.0220003559358368"
+        rpy="0 0 0" />
+      <mass
+        value="0.0958737115493759" />
+      <inertia
+        ixx="5.01939589430347E-05"
+        ixy="-2.22836991167217E-06"
+        ixz="1.94976429162029E-07"
+        iyy="4.71020812081995E-05"
+        iyz="-1.02064903158711E-07"
+        izz="7.72959084714187E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/rf_steer_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/rf_steer_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rf_steer_joint"
+    type="continuous">
+    <origin
+      xyz="0.271475382664595 -0.294511019723501 0.074707"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="rf_steer_link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rf_wheel_link">
+    <inertial>
+      <origin
+        xyz="0.00010332120966379 7.37785710262593E-05 0.000290096982515281"
+        rpy="0 0 0" />
+      <mass
+        value="0.112258355024754" />
+      <inertia
+        ixx="0.000103391197772724"
+        ixy="-1.67096741430227E-07"
+        ixz="-1.1024482979575E-08"
+        iyy="0.000103505462720063"
+        iyz="-7.93230433930119E-09"
+        izz="0.000174973978898119" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/rf_wheel_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/rf_wheel_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rf_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="0 0 -0.0684135000000001"
+      rpy="1.5707963267949 0 1.08865714634978" />
+    <parent
+      link="rf_steer_link" />
+    <child
+      link="rf_wheel_link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="lb_steer_link">
+    <inertial>
+      <origin
+        xyz="-0.00032745126697814 0.000241808785744646 -0.0220003559358365"
+        rpy="0 0 0" />
+      <mass
+        value="0.0958737115493769" />
+      <inertia
+        ixx="4.94459303912643E-05"
+        ixy="-2.59208287768629E-06"
+        ixz="-1.77030470952005E-07"
+        iyy="4.78501097599701E-05"
+        iyz="1.30745616012664E-07"
+        izz="7.72959084714192E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/lb_steer_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/lb_steer_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="lb_steer_joint"
+    type="continuous">
+    <origin
+      xyz="-0.319074617335405 0.296038980276503 0.074707"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="lb_steer_link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="lb_wheel_link">
+    <inertial>
+      <origin
+        xyz="-0.000103324696520191 -7.37822391993753E-05 0.000290095862950479"
+        rpy="0 0 0" />
+      <mass
+        value="0.112258359887751" />
+      <inertia
+        ixx="0.000103391203877734"
+        ixy="-1.67097122255156E-07"
+        ixz="1.10102912177516E-08"
+        iyy="0.000103505468689773"
+        iyz="7.91757562990057E-09"
+        izz="0.000174973978640069" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/lb_wheel_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/lb_wheel_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="lb_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="0 0 -0.0684135000000001"
+      rpy="-1.57079632679491 0 0.934708593383248" />
+    <parent
+      link="lb_steer_link" />
+    <child
+      link="lb_wheel_link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rb_steer_link">
+    <inertial>
+      <origin
+        xyz="-0.000217239955575543 -0.000344242838997163 -0.0220003559358368"
+        rpy="0 0 0" />
+      <mass
+        value="0.095873711549376" />
+      <inertia
+        ixx="4.74809497300413E-05"
+        ixy="2.44816296622426E-06"
+        ixz="-1.17470313249697E-07"
+        iyy="4.98150904211912E-05"
+        iyz="-1.8610347934834E-07"
+        izz="7.72959084714183E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/rb_steer_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/rb_steer_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rb_steer_joint"
+    type="continuous">
+    <origin
+      xyz="-0.319074617335409 -0.294511019723498 0.0747070000000001"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="rb_steer_link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rb_wheel_link">
+    <inertial>
+      <origin
+        xyz="0.000103323066337702 7.37804531038442E-05 0.000290096543531182"
+        rpy="0 0 0" />
+      <mass
+        value="0.112258356985471" />
+      <inertia
+        ixx="0.000103391200161546"
+        ixy="-1.67096822687696E-07"
+        ixz="-1.10169341186822E-08"
+        iyy="0.00010350546496622"
+        iyz="-7.92472677124098E-09"
+        izz="0.000174973978743175" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/rb_wheel_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/rb_wheel_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rb_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="0 0 -0.0684135000000001"
+      rpy="1.57079632679489 0 -0.562976568030287" />
+    <parent
+      link="rb_steer_link" />
+    <child
+      link="rb_wheel_link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="imu_link">
+    <inertial>
+      <origin
+        xyz="0 1.38777878078145E-17 -6.93889390390723E-18"
+        rpy="0 0 0" />
+      <mass
+        value="0.00014859" />
+      <inertia
+        ixx="1.26558930701482E-09"
+        ixy="3.15039491109063E-25"
+        ixz="-6.35935369538713E-25"
+        iyy="1.26558930701482E-09"
+        iyz="-1.14340567452963E-24"
+        izz="2.4765E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/imu_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/imu_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu_joint"
+    type="fixed">
+    <origin
+      xyz="0.0 0.0 0.0"
+      rpy="0 0 0.0" />
+    <parent
+      link="base_link" />
+    <child
+      link="imu_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="laser_link">
+    <inertial>
+      <origin
+        xyz="0 -2.98372437868011E-16 -0.0131553300951076"
+        rpy="0 0 0" />
+      <mass
+        value="0.186220241119358" />
+      <inertia
+        ixx="0.000100341954647472"
+        ixy="0"
+        ixz="2.41506067304865E-20"
+        iyy="0.000100341954647472"
+        iyz="1.37963967331993E-20"
+        izz="0.000155029603871516" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/laser_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://drivebase_urdf/meshes/laser_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="laser_joint"
+    type="fixed">
+    <origin
+      xyz="-0.251954440398953 -0.243681160959489 0.147487499999995"
+      rpy="0 0 -3.405517219371551" />
+    <parent
+      link="base_link" />
+    <child
+      link="laser_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>
