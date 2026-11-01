@@ -167,5 +167,7 @@ Open-source software and other people's work:
 - FRC Team 114: the robot, its chassis CAD and its drive code. The chassis model
   was exported to URDF with SW2URDF; the team's mesh files are left out.
 
-The full history of the workspace (including the robot-arm packages, logs and
-large maps) stays in a private repository. This repository is a curated snapshot.
+This repository keeps the real git history that exists: my first robot model
+(Dec 2024) and the Jetson workspace commit (Jan 2026). Most of the work happened
+directly on the Jetson, outside git, so the history is short. Logs, large maps
+and the team's mesh files were removed from every commit.
