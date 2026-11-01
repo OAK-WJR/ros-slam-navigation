@@ -124,7 +124,6 @@ include_directories(
 ## Declare a C++ library
 add_library(my_planner
   src/my_planner.cpp
-  src/my_planner_old2.cpp
 )
 
 add_dependencies(my_planner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

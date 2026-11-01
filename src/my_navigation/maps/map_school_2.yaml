@@ -1,4 +1,4 @@
-image: /root/catkin_ws/src/my_navigation/maps/map_school_2.pgm
+image: map_school_2.pgm
 resolution: 0.05
 origin: [-6.21437, -8.04292, 0.0]
 negate: 0

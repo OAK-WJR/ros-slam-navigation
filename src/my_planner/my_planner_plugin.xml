@@ -1,13 +1,7 @@
 <library path="lib/libmy_planner">
  <class name="my_planner/MyPlanner" type="my_planner::MyPlanner" base_class_type="nav_core::BaseLocalPlanner">
   <description>
-	 老子的规划器
-  </description>
- </class>
-
- <class name="my_planner/MyPlannerOld2" type="my_planner::MyPlannerOld2" base_class_type="nav_core::BaseLocalPlanner">
-  <description>
-    旧版对照用（old2）
+   Pure-pursuit local planner, built on the my_planner plugin skeleton from 6-robot/wpr_simulation (GPL-3.0).
   </description>
  </class>
 </library>

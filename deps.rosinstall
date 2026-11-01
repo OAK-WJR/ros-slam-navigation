@@ -1,0 +1,15 @@
+# Open-source packages the on-robot launch files use (not needed for the no-hardware demo).
+# Versions are the commits that were checked out on the Jetson in Jan 2026.
+# Use: cd ~/catkin_ws/src && wstool init . ../ros-slam-navigation/deps.rosinstall && wstool update
+- git:
+    local-name: jie_ware          # lidar_loc + costmap_cleaner (GPL-2.0)
+    uri: https://github.com/6-robot/jie_ware.git
+    version: cbffcf6576e113d5ab05778e5e4357ee0ec87e9a
+- git:
+    local-name: rplidar_ros       # RPLidar A1 / S2 driver (BSD-2-Clause)
+    uri: https://github.com/Slamtec/rplidar_ros.git
+    version: 3cd94febf0ad7710a3115d57f6063a0c8f6f5bb2
+- git:
+    local-name: wpb_home          # costmap parameter files used by move_base.launch (GPL-2.0)
+    uri: https://github.com/6-robot/wpb_home.git
+    version: 091744388c9d8525283a0c49f892e7bfe6a1b807

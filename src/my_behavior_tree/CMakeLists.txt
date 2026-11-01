@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(my_behavior_tree)
 
-set(CMAKE_PREFIX_PATH "/usr/local;${CMAKE_PREFIX_PATH}")
-set(yaml-cpp_DIR "/usr/local/lib/cmake/yaml-cpp")
+# On the Jetson, yaml-cpp was built from source in /usr/local.
+# For this snapshot it is found as a normal system package (libyaml-cpp-dev).
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   behaviortree_cpp_v3
-  yaml-cpp
   actionlib
 )
+find_package(yaml-cpp REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem)
 
 catkin_package(
