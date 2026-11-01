@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <SequenceStar name="Auto">
+            <SetBlackboard name="SetLevel" output_key="level" value="4"/>
+            <SetBlackboard name="SetGoal" output_key="goal" value="1"/>
+            <Fallback>
+                <Parallel failure_threshold="1" success_threshold="3">
+                    <Action ID="MoveToGoal" goal="{goal}" speed="50"/>
+                    <Action ID="SetPose" level="{level}" part="arm"/>
+                    <Action ID="SetPose" level="{level}" part="elevator"/>
+                </Parallel>
+                <Sequence name="PutGP">
+                    <Action ID="AutoLineUp" goal="{goal}"/>
+                </Sequence>
+            </Fallback>
+        </SequenceStar>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="AutoLineUp">
+            <input_port name="goal"/>
+        </Action>
+        <Action ID="LaunchGP">
+            <input_port default="coral" name="GP">coral / algae</input_port>
+            <input_port default="1" name="level"/>
+        </Action>
+        <Action ID="MoveToGoal">
+            <input_port default="1" name="goal"/>
+            <input_port default="50" name="speed"/>
+        </Action>
+        <Action ID="SetPose">
+            <input_port name="level"/>
+            <input_port name="part">arm / elevator / coral intake</input_port>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>

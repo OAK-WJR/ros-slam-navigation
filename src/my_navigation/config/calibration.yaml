@@ -1,0 +1,3 @@
+motor_control_node:
+  pwm_center_left: 1542
+  pwm_center_right: 1401

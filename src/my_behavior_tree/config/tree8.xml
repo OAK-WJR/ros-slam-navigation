@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- 主树 -->
+    <BehaviorTree ID="BehaviorTree">
+        <SequenceStar name="Auto">
+            <!-- 全局设置黑板变量 -->
+            <SetBlackboard name="SetGoal" output_key="goal" value="1"/>
+            <SetBlackboard name="SetSpeed" output_key="speed" value="50"/>
+            <SetBlackboard name="SetGP" output_key="GP" value="coral"/>
+            <SetBlackboard name="SetLevel" output_key="level" value="4"/>
+            <Fallback>
+                <SubTree ID="MoveAndSetPose"/>
+                <SubTree ID="PutGP"/>
+            </Fallback>
+            <Repeat num_cycles="3">
+                <SequenceStar>
+                    <Action ID="IncrementVariable" variable="{goal}"/>
+                    <SetBlackboard output_key="level" value="0"/>
+                    <SubTree ID="MoveAndSetPose"/>
+                    <SubTree ID="GetGP"/>
+                    <Action ID="IncrementVariable" variable="{goal}"/>
+                    <SetBlackboard output_key="level" value="4"/>
+                    <SubTree ID="MoveAndSetPose"/>
+                    <SubTree ID="PutGP"/>
+                </SequenceStar>
+            </Repeat>
+        </SequenceStar>
+    </BehaviorTree>
+
+    <!-- GetGP 子树 -->
+    <BehaviorTree ID="GetGP">
+        <Sequence name="GetGP">
+            <!-- 在 GetGP 子树中明确设置所需变量 -->
+            <SetBlackboard output_key="goal" value="1"/>
+            <SetBlackboard output_key="GP" value="coral"/>
+            <SetBlackboard output_key="level" value="4"/>
+            <RetryUntilSuccessful num_attempts="3">
+                <Action ID="AutoLineUp" goal="{goal}"/>
+            </RetryUntilSuccessful>
+            <Action ID="IntakeGP" GP="{GP}" level="{level}"/>
+        </Sequence>
+    </BehaviorTree>
+
+    <!-- MoveAndSetPose 子树 -->
+    <BehaviorTree ID="MoveAndSetPose">
+        <SequenceStar name="MoveAndSetPose">
+            <!-- 在 MoveAndSetPose 子树中明确设置所需变量 -->
+            <SetBlackboard output_key="goal" value="1"/>
+            <SetBlackboard output_key="GP" value="coral"/>
+            <SetBlackboard output_key="level" value="4"/>
+            <Parallel failure_threshold="1" success_threshold="3">
+                <!-- MoveToGoal 直接传入字面值，避免 remap -->
+                <Action ID="MoveToGoal" goal="1" speed="50"/>
+                <Action ID="SetPose" GP="{GP}" level="{level}" part="arm"/>
+                <Action ID="SetPose" GP="{GP}" level="{level}" part="elevator"/>
+            </Parallel>
+        </SequenceStar>
+    </BehaviorTree>
+
+    <!-- PutGP 子树 -->
+    <BehaviorTree ID="PutGP">
+        <Sequence name="PutGP">
+            <!-- 在 PutGP 子树中明确设置所需变量 -->
+            <SetBlackboard output_key="goal" value="1"/>
+            <SetBlackboard output_key="GP" value="coral"/>
+            <SetBlackboard output_key="level" value="4"/>
+            <RetryUntilSuccessful num_attempts="3">
+                <Action ID="AutoLineUp" goal="{goal}"/>
+            </RetryUntilSuccessful>
+            <Action ID="LaunchGP" GP="{GP}" level="{level}"/>
+        </Sequence>
+    </BehaviorTree>
+
+    <!-- 节点模型定义（用于编辑器显示和默认值） -->
+    <TreeNodesModel>
+        <Action ID="AutoLineUp">
+            <input_port name="goal"/>
+        </Action>
+        <SubTree ID="GetGP"/>
+        <Action ID="IncrementVariable">
+            <inout_port name="variable"/>
+        </Action>
+        <Action ID="IntakeGP">
+            <input_port name="GP"/>
+            <input_port name="level"/>
+        </Action>
+        <Action ID="LaunchGP">
+            <input_port default="coral" name="GP">coral / algae</input_port>
+            <input_port default="1" name="level"/>
+        </Action>
+        <SubTree ID="MoveAndSetPose"/>
+        <Action ID="MoveToGoal">
+            <input_port default="1" name="goal"/>
+            <input_port default="50" name="speed"/>
+        </Action>
+        <SubTree ID="PutGP"/>
+        <Action ID="SetPose">
+            <input_port name="GP"/>
+            <input_port name="level"/>
+            <input_port name="part">arm / elevator / coral intake</input_port>
+        </Action>
+    </TreeNodesModel>
+</root>

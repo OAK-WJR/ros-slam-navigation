@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <Sequence name="Auto">
+      <!-- 1. 先设定目标点为 Point1，并移动到点1 -->
+      <SetBlackboard output_key="target" value="Point1"/>
+      <MoveToGoal goal="{target}"/>
+
+      <!-- 2. 放东西 -->
+      <PutCoral/>
+
+      <!-- 3. 拿东西分支 -->
+      <Fallback name="PickCoral">
+        <!-- 分支1：拿东西成功后设定目标为 Point2 并移动 -->
+        <Sequence name="SuccessPath">
+          <SetBlackboard output_key="target" value="Point2"/>
+          <MoveToGoal goal="{target}"/>
+        </Sequence>
+        <!-- 分支2：拿东西失败后重新尝试拿东西，然后设定目标为 Point3 并移动 -->
+        <Sequence name="FailurePath">
+          <PickCoral/>
+          <SetBlackboard output_key="target" value="Point3"/>
+          <MoveToGoal goal="{target}"/>
+        </Sequence>
+      </Fallback>
+    </Sequence>
+  </BehaviorTree>
+
+  <TreeNodesModel>
+    <Action ID="AutoLineUp">
+        <input_port name="goal"/>
+    </Action>
+    <Action ID="MoveToGoal">
+        <input_port name="goal"/>
+    </Action>
+    <Action ID="PickCoral"/>
+    <Action ID="PlaceCoral">
+        <input_port name="level"/>
+    </Action>
+    <Action ID="PutCoral"/>
+</TreeNodesModel>
+</root>

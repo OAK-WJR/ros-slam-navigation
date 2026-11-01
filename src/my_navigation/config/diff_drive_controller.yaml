@@ -1,0 +1,27 @@
+diff_drive_controller:
+  type: "diff_drive_controller/DiffDriveController"
+  publish_rate: 50.0
+  update_rate: 50.0
+
+  left_wheel: 'left_wheel_joint'
+  right_wheel: 'right_wheel_joint'
+
+  wheel_separation: 0.1
+  wheel_radius: 0.033
+
+  enable_odom_tf: true
+  cmd_vel_timeout: 0.5
+  max_linear_velocity: 1.0
+  max_angular_velocity: 2.0
+
+  pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]
+  twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]
+  
+  pid:
+    Kp: 3.0          # 比例增益
+    Ki: 0.0001        # 积分增益
+    Kd: 2.0           # 微分增益
+    e_integral_max: 100.0  # 积分误差最大值
+  pwm:
+    center_left: 1398  # 左轮 PWM 中点值
+    center_right: 1398 # 右轮 PWM 中点值
