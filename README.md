@@ -171,3 +171,7 @@ This repository keeps the real git history that exists: my first robot model
 (Dec 2024) and the Jetson workspace commit (Jan 2026). Most of the work happened
 directly on the Jetson, outside git, so the history is short. Logs, large maps
 and the team's mesh files were removed from every commit.
+
+## License
+
+MIT for my own code and documents (see `LICENSE`). `src/my_planner/` is third-party code under GPL-3.0 and stays under GPL-3.0 (`src/my_planner/LICENSE`, `src/my_planner/NOTICE.md`).
