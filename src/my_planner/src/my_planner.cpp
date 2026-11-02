@@ -17,12 +17,12 @@ namespace my_planner
     void MyPlanner::initialize(std::string name, tf2_ros::Buffer* tf, costmap_2d::Costmap2DROS* costmap_ros)
     {
         if (initialized_) return;
-        ROS_WARN("MyPlanner 初始化：使用纯追踪(Pure Pursuit)+限速（可通过参数调快/调顺）");
+        ROS_WARN("MyPlanner init: using Pure Pursuit + speed limits (params can make it faster/smoother)");
 
         costmap_ros_ = costmap_ros;
         tf_listener_ = std::make_unique<tf::TransformListener>();
 
-        // 用私有命名空间读取参数：~/<name>/xxx
+        // Read params from the private namespace: ~/<name>/xxx
         ros::NodeHandle nh("~/" + name);
         nh.param("lookahead_dist", lookahead_dist_, lookahead_dist_);
         nh.param("goal_dist_tol",  goal_dist_tol_,  goal_dist_tol_);
@@ -56,15 +56,15 @@ namespace my_planner
         cmd_vel = geometry_msgs::Twist();
 
         if (!initialized_) {
-            ROS_WARN_THROTTLE(1.0, "MyPlanner 尚未 initialize()");
+            ROS_WARN_THROTTLE(1.0, "MyPlanner: initialize() not called yet");
             return false;
         }
         if (global_plan_.empty()) {
-            ROS_WARN_THROTTLE(1.0, "MyPlanner 未收到全局路径(plan 为空)");
+            ROS_WARN_THROTTLE(1.0, "MyPlanner has not received a global path (plan is empty)");
             return false;
         }
 
-        // 1) 终点在 base_link 下的位姿
+        // 1) Goal pose in base_link
         const int final_index = static_cast<int>(global_plan_.size()) - 1;
         geometry_msgs::PoseStamped pose_final_bl;
         try {
@@ -72,7 +72,7 @@ namespace my_planner
             tmp.header.stamp = ros::Time(0);
             tf_listener_->transformPose("base_link", tmp, pose_final_bl);
         } catch (const tf::TransformException& e) {
-            ROS_WARN_THROTTLE(1.0, "TF 变换失败：无法把终点变到 base_link: %s", e.what());
+            ROS_WARN_THROTTLE(1.0, "TF transform failed: cannot transform the goal to base_link: %s", e.what());
             return false;
         }
 
@@ -80,7 +80,7 @@ namespace my_planner
         const double dy_goal = pose_final_bl.pose.position.y;
         const double dist_goal = std::hypot(dx_goal, dy_goal);
 
-        // 2) 到达终点：可选是否对齐朝向
+        // 2) Goal reached: optionally align the heading
         if (dist_goal < goal_dist_tol_) {
             const double yaw_err = tf::getYaw(pose_final_bl.pose.orientation);
             if (!goal_yaw_align_ || std::fabs(yaw_err) < goal_yaw_tol_) {
@@ -89,7 +89,7 @@ namespace my_planner
                 cmd_vel.angular.z = 0.0;
                 return true;
             }
-            // 需要对齐朝向，但如果禁止原地转圈，则不在这里旋转，直接停住（交给上层/人工处理）
+            // Heading needs aligning, but if in-place rotation is disabled, do not rotate here; just stop (leave it to the upper layer/manual handling)
             if (!allow_in_place_rotate_) {
                 cmd_vel.linear.x = 0.0;
                 cmd_vel.angular.z = 0.0;
@@ -102,7 +102,7 @@ namespace my_planner
             return true;
         }
 
-        // 3) 选取前视点（base_link 坐标系）
+        // 3) Pick the lookahead point (base_link frame)
         geometry_msgs::PoseStamped target_bl;
         bool found = false;
         for (int i = std::max(0, target_index_); i < static_cast<int>(global_plan_.size()); i++) {
@@ -121,7 +121,7 @@ namespace my_planner
             }
         }
         if (!found) {
-            // 没找到足够远的点，就用终点
+            // No point far enough away found; use the goal
             target_bl = pose_final_bl;
         }
 
@@ -130,7 +130,7 @@ namespace my_planner
         const double heading_err = std::atan2(ty, tx);
 
         /*
-        // 4) 角度误差太大：默认会优先原地转；但如果没有 IMU/悬空测试，可关闭该行为
+        // 4) Angle error too large: by default turn in place first; but with no IMU / a wheels-off-the-ground test, this can be turned off
         if (std::fabs(heading_err) > yaw_stop_thresh_ && allow_in_place_rotate_) {
             cmd_vel.linear.x = 0.0;
             double w = std::max(min_vel_theta_, std::min(max_vel_theta_, std::fabs(kp_ang_ * heading_err)));
@@ -139,13 +139,13 @@ namespace my_planner
         }
             */
 
-        // 5) 线速度：跟距离成比例，同时受朝向误差影响（越偏转越慢）
+        // 5) Linear speed: proportional to distance, also affected by heading error (the more off, the slower)
         const double dist_target = std::hypot(tx, ty);
         double v = kp_lin_ * dist_target;
-        v *= std::max(0.0, std::cos(heading_err));  // 偏航误差越大越减速
+        v *= std::max(0.0, std::cos(heading_err));  // The larger the heading error, the slower
         v = std::min(max_vel_x_, std::max(min_vel_x_, v));
 
-        // 6) 角速度：跟朝向误差成比例并限幅
+        // 6) Angular speed: proportional to heading error, with limits
         double w = kp_ang_ * heading_err;
         w = std::max(-max_vel_theta_, std::min(max_vel_theta_, w));
         if (std::fabs(w) > 1e-6 && std::fabs(w) < min_vel_theta_) {

@@ -1,5 +1,5 @@
 <launch>
-    <!-- 允许通过 launch 参数切换规划器（不改代码即可对比效果） -->
+    <!-- Allow switching planners with a launch arg (compare results without changing code) -->
     <arg name="base_global_planner" default="global_planner/GlobalPlanner" />
     <arg name="base_local_planner" default="my_planner/MyPlanner" />
 
@@ -10,7 +10,7 @@
         <rosparam file="$(find wpb_home_tutorials)/nav_lidar/global_costmap_params.yaml" command="load" />
         <rosparam file="$(find wpb_home_tutorials)/nav_lidar/local_costmap_params.yaml" command="load" />
 
-        <!-- 全局路径更平滑/转弯更少（对 ROS1 的 global_planner/GlobalPlanner 生效） -->
+        <!-- Smoother global path / fewer turns (applies to the ROS1 global_planner/GlobalPlanner) -->
         <rosparam>
           GlobalPlanner:
             use_quadratic: true

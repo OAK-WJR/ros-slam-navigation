@@ -9,17 +9,17 @@
 #include <boost/filesystem.hpp>
 
 
-// 定义全局变量 waypoints
+// Define the global variable waypoints
 std::unordered_map<std::string, geometry_msgs::Pose> waypoints;
 
-// 实现 loadWaypoints 函数
+// Implement the loadWaypoints function
 void loadWaypoints(const std::string& filename)
 {
   try
   {
 
     {
-      // 使用局部作用域确保 yaml 对象尽早析构
+      // Use a local scope so the yaml object is destroyed as early as possible
       YAML::Node yaml = YAML::LoadFile(filename);
       for (const auto& it : yaml)
       {
@@ -31,42 +31,42 @@ void loadWaypoints(const std::string& filename)
         waypoints[goal_name] = pose;
       }
     }
-    ROS_INFO("📡 读取 %lu 个目标点", waypoints.size());
+    ROS_INFO("📡 Read %lu goal points", waypoints.size());
   }
   catch(const std::exception &e)
   {
-    ROS_ERROR("加载 waypoints 文件失败: %s", e.what());
+    ROS_ERROR("Failed to load waypoints file: %s", e.what());
     throw std::runtime_error(e.what());
   }
 }
 
 
 
-// 实现 MoveToGoal 的构造函数
+// Implement the MoveToGoal constructor
 MoveToGoal2::MoveToGoal2(const std::string &name, const BT::NodeConfiguration &config)
     : BT::StatefulActionNode(name, config), ac_("move_base", true)
 {
 }
 
-// 实现静态函数 providedPorts
+// Implement the static function providedPorts
 BT::PortsList MoveToGoal2::providedPorts()
 {
     return {BT::InputPort<std::string>("goal")};
 }
 
-// 实现 onStart 函数
+// Implement the onStart function
 BT::NodeStatus MoveToGoal2::onStart()
 {
     std::string goal_name;
     if (!getInput("goal", goal_name))
     {
-        ROS_ERROR("MoveToGoal: 目标点未设置！");
+        ROS_ERROR("MoveToGoal: goal point not set!");
         return BT::NodeStatus::FAILURE;
     }
 
     if (waypoints.find(goal_name) == waypoints.end())
     {
-        ROS_ERROR("MoveToGoal: 目标点 %s 不存在！", goal_name.c_str());
+        ROS_ERROR("MoveToGoal: goal point %s does not exist!", goal_name.c_str());
         return BT::NodeStatus::FAILURE;
     }
 
@@ -77,36 +77,36 @@ BT::NodeStatus MoveToGoal2::onStart()
     goal.target_pose.header.stamp = ros::Time::now();
     goal.target_pose.pose = goal_pose;
 
-    ROS_INFO("📍 发送导航目标点: %s (x=%.2f, y=%.2f)",
+    ROS_INFO("📍 Sending navigation goal point: %s (x=%.2f, y=%.2f)",
              goal_name.c_str(), goal_pose.position.x, goal_pose.position.y);
     ac_.sendGoal(goal);
     return BT::NodeStatus::RUNNING;
 }
 
-// 实现 onRunning 函数
+// Implement the onRunning function
 BT::NodeStatus MoveToGoal2::onRunning()
 {
     if (ac_.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
     {
-        ROS_INFO("✅ 目标点到达成功");
+        ROS_INFO("✅ Goal point reached");
         return BT::NodeStatus::SUCCESS;
     }
     else if (ac_.getState() == actionlib::SimpleClientGoalState::ABORTED)
     {
-        ROS_WARN("❌ 目标点到达失败");
+        ROS_WARN("❌ Failed to reach goal point");
         return BT::NodeStatus::FAILURE;
     }
     return BT::NodeStatus::RUNNING;
 }
 
-// 实现 onHalted 函数
+// Implement the onHalted function
 void MoveToGoal2::onHalted()
 {
     ac_.cancelGoal();
-    ROS_WARN("⏹️ 取消当前目标");
+    ROS_WARN("⏹️ Canceled the current goal");
 }
 
-// 注册节点（供 BehaviorTreeFactory 使用）
+// Register the node (for BehaviorTreeFactory)
 BT_REGISTER_NODES(factory)
 {
     factory.registerNodeType<MoveToGoal2>("MoveToGoal2");

@@ -8,18 +8,18 @@ class DiffDriveHardware:
     def __init__(self):
         rospy.init_node("diff_drive_hardware")
 
-        # 定义关节名称
+        # Define joint names
         self.joint_names = ["left_wheel_joint", "right_wheel_joint"]
 
-        # 关节状态（初始化为 0）
+        # Joint states (initialized to 0)
         self.joint_positions = [0.0, 0.0]
         self.joint_velocities = [0.0, 0.0]
         self.joint_efforts = [0.0, 0.0]
 
-        # 速度命令
+        # Velocity commands
         self.joint_commands = [0.0, 0.0]
 
-        # 发布和订阅
+        # Publish and subscribe
         self.joint_state_pub = rospy.Publisher("/joint_states", JointState, queue_size=10)
         self.command_subs = [
             rospy.Subscriber("/left_wheel_velocity_controller/command", Float64, self.left_wheel_command_callback),
@@ -27,15 +27,15 @@ class DiffDriveHardware:
         ]
 
     def left_wheel_command_callback(self, msg):
-        """左轮速度命令回调"""
+        """Left wheel velocity command callback"""
         self.joint_commands[0] = msg.data
 
     def right_wheel_command_callback(self, msg):
-        """右轮速度命令回调"""
+        """Right wheel velocity command callback"""
         self.joint_commands[1] = msg.data
 
     def publish_joint_states(self):
-        """发布关节状态"""
+        """Publish joint states"""
         joint_state = JointState()
         joint_state.header.stamp = rospy.Time.now()
         joint_state.name = self.joint_names
@@ -44,7 +44,7 @@ class DiffDriveHardware:
         self.joint_state_pub.publish(joint_state)
 
     def update_joint_states(self, dt):
-        """更新关节状态"""
+        """Update joint states"""
         self.joint_positions[0] += self.joint_commands[0] * dt
         self.joint_positions[1] += self.joint_commands[1] * dt
         self.joint_velocities = self.joint_commands
@@ -57,7 +57,7 @@ class DiffDriveHardware:
             dt = (current_time - prev_time).to_sec()
             prev_time = current_time
 
-            # 更新关节状态并发布
+            # Update joint states and publish
             self.update_joint_states(dt)
             self.publish_joint_states()
 

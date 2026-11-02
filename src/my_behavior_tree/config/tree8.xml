@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <root main_tree_to_execute="BehaviorTree">
-    <!-- 主树 -->
+    <!-- Main tree -->
     <BehaviorTree ID="BehaviorTree">
         <SequenceStar name="Auto">
-            <!-- 全局设置黑板变量 -->
+            <!-- Set blackboard variables globally -->
             <SetBlackboard name="SetGoal" output_key="goal" value="1"/>
             <SetBlackboard name="SetSpeed" output_key="speed" value="50"/>
             <SetBlackboard name="SetGP" output_key="GP" value="coral"/>
@@ -27,10 +27,10 @@
         </SequenceStar>
     </BehaviorTree>
 
-    <!-- GetGP 子树 -->
+    <!-- GetGP subtree -->
     <BehaviorTree ID="GetGP">
         <Sequence name="GetGP">
-            <!-- 在 GetGP 子树中明确设置所需变量 -->
+            <!-- Explicitly set the needed variables in the GetGP subtree -->
             <SetBlackboard output_key="goal" value="1"/>
             <SetBlackboard output_key="GP" value="coral"/>
             <SetBlackboard output_key="level" value="4"/>
@@ -41,15 +41,15 @@
         </Sequence>
     </BehaviorTree>
 
-    <!-- MoveAndSetPose 子树 -->
+    <!-- MoveAndSetPose subtree -->
     <BehaviorTree ID="MoveAndSetPose">
         <SequenceStar name="MoveAndSetPose">
-            <!-- 在 MoveAndSetPose 子树中明确设置所需变量 -->
+            <!-- Explicitly set the needed variables in the MoveAndSetPose subtree -->
             <SetBlackboard output_key="goal" value="1"/>
             <SetBlackboard output_key="GP" value="coral"/>
             <SetBlackboard output_key="level" value="4"/>
             <Parallel failure_threshold="1" success_threshold="3">
-                <!-- MoveToGoal 直接传入字面值，避免 remap -->
+                <!-- MoveToGoal is given literal values directly, to avoid remap -->
                 <Action ID="MoveToGoal" goal="1" speed="50"/>
                 <Action ID="SetPose" GP="{GP}" level="{level}" part="arm"/>
                 <Action ID="SetPose" GP="{GP}" level="{level}" part="elevator"/>
@@ -57,10 +57,10 @@
         </SequenceStar>
     </BehaviorTree>
 
-    <!-- PutGP 子树 -->
+    <!-- PutGP subtree -->
     <BehaviorTree ID="PutGP">
         <Sequence name="PutGP">
-            <!-- 在 PutGP 子树中明确设置所需变量 -->
+            <!-- Explicitly set the needed variables in the PutGP subtree -->
             <SetBlackboard output_key="goal" value="1"/>
             <SetBlackboard output_key="GP" value="coral"/>
             <SetBlackboard output_key="level" value="4"/>
@@ -71,7 +71,7 @@
         </Sequence>
     </BehaviorTree>
 
-    <!-- 节点模型定义（用于编辑器显示和默认值） -->
+    <!-- Node model definitions (for editor display and default values) -->
     <TreeNodesModel>
         <Action ID="AutoLineUp">
             <input_port name="goal"/>

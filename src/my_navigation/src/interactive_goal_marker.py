@@ -8,39 +8,39 @@ from interactive_markers.menu_handler import MenuHandler
 from visualization_msgs.msg import InteractiveMarker, InteractiveMarkerControl, Marker
 from geometry_msgs.msg import PoseArray, Pose
 
-# 目标点存储文件
+# Goal point storage file
 WAYPOINTS_FILE = os.path.expanduser("~/catkin_ws/src/my_navigation/config/waypoints.yaml")
 
-# 初始化 ROS 节点
+# Initialize the ROS node
 rospy.init_node("interactive_goal_marker")
 
-# 创建 Interactive Marker 服务器
+# Create the Interactive Marker server
 server = InteractiveMarkerServer("interactive_marker_server")
 
-# 创建菜单处理器（用于右键菜单）
+# Create the menu handler (for the right-click menu)
 menu_handler = MenuHandler()
 
-# 目标点存储（发布用）
+# Goal point storage (for publishing)
 waypoints = {}
 
-# **发布目标点**
+# **Publish goal points**
 waypoint_pub = rospy.Publisher("/waypoints", PoseArray, queue_size=10)
 
 def load_waypoints():
-    """ 读取上次保存的目标点 """
+    """ Read the goal points saved last time """
     if os.path.exists(WAYPOINTS_FILE):
         with open(WAYPOINTS_FILE, "r") as file:
             return yaml.safe_load(file) or {}
     return {}
 
 def save_waypoints():
-    """ 保存所有目标点到 YAML 文件 """
+    """ Save all goal points to a YAML file """
     with open(WAYPOINTS_FILE, "w") as file:
         yaml.safe_dump(waypoints, file)
-    rospy.loginfo("✅ 目标点已保存")
+    rospy.loginfo("✅ Goal points saved")
 
 def publish_waypoints():
-    """ 发布所有目标点到 /waypoints 话题 """
+    """ Publish all goal points to the /waypoints topic """
     msg = PoseArray()
     msg.header.frame_id = "map"
     msg.header.stamp = rospy.Time.now()
@@ -57,10 +57,10 @@ def publish_waypoints():
         msg.poses.append(pose)
 
     waypoint_pub.publish(msg)
-    rospy.loginfo("📡 已发布所有目标点到 /waypoints")
+    rospy.loginfo("📡 Published all goal points to /waypoints")
 
 def process_feedback(feedback):
-    """ 交互回调函数，用户拖动 marker 或旋转后触发 """
+    """ Interaction callback, triggered after the user drags or rotates the marker """
     global waypoints
     x = feedback.pose.position.x
     y = feedback.pose.position.y
@@ -72,13 +72,13 @@ def process_feedback(feedback):
     ])[2]
 
     waypoints[feedback.marker_name] = {"x": x, "y": y, "yaw": yaw}
-    rospy.loginfo("🔄 目标点 [%s] 更新: x=%.2f, y=%.2f, yaw=%.2f", feedback.marker_name, x, y, yaw)
+    rospy.loginfo("🔄 Goal point [%s] updated: x=%.2f, y=%.2f, yaw=%.2f", feedback.marker_name, x, y, yaw)
 
     save_waypoints()
     publish_waypoints()
 
 def create_marker(marker_name="goal_marker", x=0.0, y=0.0, yaw=0.0):
-    """ 创建交互式标记点 """
+    """ Create an interactive marker """
     marker = InteractiveMarker()
     marker.header.frame_id = "map"
     marker.name = marker_name
@@ -96,7 +96,7 @@ def create_marker(marker_name="goal_marker", x=0.0, y=0.0, yaw=0.0):
 
     marker.controls = []
 
-    # **XY 平面移动控制**
+    # **XY plane move control**
     move_control = InteractiveMarkerControl()
     move_control.name = "move_xy"
     move_control.interaction_mode = InteractiveMarkerControl.MOVE_PLANE  
@@ -105,7 +105,7 @@ def create_marker(marker_name="goal_marker", x=0.0, y=0.0, yaw=0.0):
     move_control.always_visible = True  
     marker.controls.append(move_control)
 
-    # **Z 轴旋转控制**
+    # **Z axis rotation control**
     rotate_control = InteractiveMarkerControl()
     rotate_control.name = "rotate_z"
     rotate_control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS  
@@ -115,10 +115,10 @@ def create_marker(marker_name="goal_marker", x=0.0, y=0.0, yaw=0.0):
     rotate_control.orientation.z = 0.0
     marker.controls.append(rotate_control)
 
-    # **添加方向箭头**
+    # **Add a direction arrow**
     arrow_marker = Marker()
     arrow_marker.type = Marker.ARROW  
-    arrow_marker.scale.x = 0.1  # **箭头长度**
+    arrow_marker.scale.x = 0.1  # **Arrow length**
     arrow_marker.scale.y = 0.02  
     arrow_marker.scale.z = 0.02
     arrow_marker.color.r = 0.0
@@ -128,9 +128,9 @@ def create_marker(marker_name="goal_marker", x=0.0, y=0.0, yaw=0.0):
     arrow_marker.header.frame_id = "map"
     arrow_marker.pose.position.x = x
     arrow_marker.pose.position.y = y
-    arrow_marker.pose.position.z = 0.0  # **让箭头稍微浮起**
+    arrow_marker.pose.position.z = 0.0  # **Lift the arrow slightly**
 
-    # **确保箭头方向和目标方向一致**
+    # **Make sure the arrow points the same way as the goal**
     arrow_marker.pose.orientation.x = quat[0]
     arrow_marker.pose.orientation.y = quat[1]
     arrow_marker.pose.orientation.z = quat[2]
@@ -138,7 +138,7 @@ def create_marker(marker_name="goal_marker", x=0.0, y=0.0, yaw=0.0):
 
     move_control.markers.append(arrow_marker)  
 
-    # **创建球形视觉 marker**
+    # **Create a sphere visual marker**
     sphere_marker = Marker()
     sphere_marker.type = Marker.SPHERE
     sphere_marker.scale.x = 0.1
@@ -151,35 +151,35 @@ def create_marker(marker_name="goal_marker", x=0.0, y=0.0, yaw=0.0):
     sphere_marker.header.frame_id = "map"
     sphere_marker.pose.position.x = x
     sphere_marker.pose.position.y = y
-    sphere_marker.pose.position.z = 0.0  # **确保球体位置正确**
+    sphere_marker.pose.position.z = 0.0  # **Make sure the sphere position is correct**
 
-    move_control.markers.append(sphere_marker)  # **添加球形 Marker**
+    move_control.markers.append(sphere_marker)  # **Add the sphere Marker**
 
-    # **添加文本 Marker（显示目标点名字）**
+    # **Add a text Marker (shows the goal point name)**
     text_marker = Marker()
-    text_marker.type = Marker.TEXT_VIEW_FACING  # **让文字面向相机**
-    text_marker.text = marker_name  # **设置目标点名字**
-    text_marker.scale.z = 0.2  # **字体大小**
+    text_marker.type = Marker.TEXT_VIEW_FACING  # **Make the text face the camera**
+    text_marker.text = marker_name  # **Set the goal point name**
+    text_marker.scale.z = 0.2  # **Font size**
     text_marker.color.r = 1.0
     text_marker.color.g = 1.0
     text_marker.color.b = 1.0
     text_marker.color.a = 1.0
     text_marker.header.frame_id = "map"
-    text_marker.pose.position.x = x  # **名字的位置**
+    text_marker.pose.position.x = x  # **Name position**
     text_marker.pose.position.y = y
-    text_marker.pose.position.z = 0.1  # **降低名字高度**
+    text_marker.pose.position.z = 0.1  # **Lower the name height**
     
-    move_control.markers.append(text_marker)  # **把名字 Marker 添加到控件**
+    move_control.markers.append(text_marker)  # **Add the name Marker to the control**
 
     server.insert(marker, process_feedback)
     server.applyChanges()
 
 def create_menu_button():
-    """ 创建 RViz 右键菜单按钮 """
+    """ Create the RViz right-click menu button """
     button_marker = InteractiveMarker()
     button_marker.header.frame_id = "map"
     button_marker.name = "add_goal_menu"
-    button_marker.description = "右键 → 添加目标点"
+    button_marker.description = "Right-click → Add goal point"
     button_marker.scale = 0.5
     button_marker.pose.position.x = 1.0
     button_marker.pose.position.y = 0.0
@@ -203,38 +203,38 @@ def create_menu_button():
     button_marker.controls.append(menu_control)
 
     global menu_handler
-    menu_handler.insert("添加新目标点", callback=menu_feedback)
+    menu_handler.insert("Add new goal point", callback=menu_feedback)
 
     server.insert(button_marker)
     menu_handler.apply(server, button_marker.name)  
     server.applyChanges()
 
-    rospy.loginfo("✅ 右键菜单按钮已创建")
+    rospy.loginfo("✅ Right-click menu button created")
 
 def menu_feedback(feedback):
-    """ 处理菜单点击事件，创建新目标点 """
+    """ Handle the menu click event: create a new goal point """
     global waypoints
     goal_name = "{}".format(len(waypoints)+1)
 
-    rospy.loginfo("✨ 创建新目标点: %s", goal_name)
+    rospy.loginfo("✨ Creating new goal point: %s", goal_name)
     create_marker(marker_name=goal_name, x=0.0, y=0.0, yaw=0.0)
 
     waypoints[goal_name] = {"x": 0.0, "y": 0.0, "yaw": 0.0}
     save_waypoints()
     publish_waypoints()
 
-# **🚀 启动流程**
-rospy.loginfo("Interactive Markers 服务器已启动")
+# **🚀 Startup**
+rospy.loginfo("Interactive Markers server started")
 
-# **加载并恢复所有目标点**
+# **Load and restore all goal points**
 waypoints = load_waypoints()
 for name, coords in waypoints.items():
     create_marker(marker_name=name, x=coords["x"], y=coords["y"], yaw=coords["yaw"])
 
-# **创建交互菜单**
+# **Create the interactive menu**
 create_menu_button()
 
-# **定期发布目标点**
+# **Publish goal points periodically**
 rate = rospy.Rate(1)  # 1 Hz
 while not rospy.is_shutdown():
     publish_waypoints()

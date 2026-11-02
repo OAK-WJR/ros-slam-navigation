@@ -32,18 +32,18 @@
     <gazebo>
       <plugin name="gazebo_ros_p3d" filename="libgazebo_ros_p3d.so">
         <alwaysOn>true</alwaysOn>
-        <updateRate>50.0</updateRate>  <!-- 50Hz 更新 -->
-        <bodyName>base_link</bodyName>  <!-- 绑定基座 -->
-        <topicName>odom</topicName>  <!-- 里程计话题 -->
-        <frameName>odom</frameName>  <!-- 里程计坐标系 -->
-        <childFrameName>base_link</childFrameName>  <!-- 绑定机器人本体 -->
+        <updateRate>50.0</updateRate>  <!-- 50Hz update -->
+        <bodyName>base_link</bodyName>  <!-- Bind to the base -->
+        <topicName>odom</topicName>  <!-- Odometry topic -->
+        <frameName>odom</frameName>  <!-- Odometry frame -->
+        <childFrameName>base_link</childFrameName>  <!-- Bind to the robot body -->
         <xyzOffsets>0 0 0</xyzOffsets>
         <rpyOffsets>0 0 0</rpyOffsets>
       </plugin>
     </gazebo>
   </link>
 
-  <!-- 添加gazebo_ros_control插件 -->
+  <!-- Add the gazebo_ros_control plugin -->
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/</robotNamespace>
@@ -492,7 +492,7 @@
     <gazebo reference="imu_link">
       <sensor type="imu" name="imu_sensor">
         <pose>0 0 0 0 0 0</pose>
-        <update_rate>50</update_rate>  <!-- 50Hz 采样 -->
+        <update_rate>50</update_rate>  <!-- 50Hz sampling -->
         <imu>
           <angular_velocity>
             <noise type="gaussian">
@@ -508,7 +508,7 @@
           </linear_acceleration>
         </imu>
         <plugin name="gazebo_ros_imu" filename="libgazebo_ros_imu.so">
-          <topicName>/imu/data</topicName>  <!-- IMU 数据话题 -->
+          <topicName>/imu/data</topicName>  <!-- IMU data topic -->
           <frameName>imu_link</frameName>
         </plugin>
       </sensor>
@@ -560,24 +560,24 @@
     <gazebo reference="laser_link">
       <sensor type="ray" name="laser_sensor">
         <pose>0 0 0 0 0 0</pose>
-        <update_rate>10.0</update_rate>  <!-- 10Hz 采样 -->
+        <update_rate>10.0</update_rate>  <!-- 10Hz sampling -->
         <ray>
           <scan>
             <horizontal>
-              <samples>360</samples>  <!-- 360°扫描 -->
+              <samples>360</samples>  <!-- 360° scan -->
               <resolution>1</resolution>
               <min_angle>-1.5708</min_angle>  <!-- -90° -->
               <max_angle>1.5708</max_angle>   <!-- +90° -->
             </horizontal>
           </scan>
           <range>
-            <min>0.2</min>  <!-- 最小探测距离 0.2m -->
-            <max>10.0</max>  <!-- 最大探测距离 10m -->
+            <min>0.2</min>  <!-- Min detection range 0.2m -->
+            <max>10.0</max>  <!-- Max detection range 10m -->
             <resolution>0.01</resolution>
           </range>
         </ray>
         <plugin name="gazebo_ros_laser" filename="libgazebo_ros_laser.so">
-          <topicName>/scan</topicName>  <!-- 发布到 /scan 话题 -->
+          <topicName>/scan</topicName>  <!-- Publish to the /scan topic -->
           <frameName>laser_link</frameName>
         </plugin>
       </sensor>
@@ -597,7 +597,7 @@
       xyz="0 0 0" />
   </joint>
 
-  <!-- 添加传动装置配置 -->
+  <!-- Add transmission config -->
   <transmission name="lf_wheel_trans">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="lf_wheel_joint">

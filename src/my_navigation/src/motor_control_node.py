@@ -10,19 +10,19 @@ from std_msgs.msg import Int16MultiArray
 
 class CmdVelToPWMNode(object):
     def __init__(self):
-        # 1. 初始化 ROS 节点
+        # 1. Initialize the ROS node
         rospy.init_node("cmd_vel_to_raw_pwm_node", anonymous=True)
 
-        # 2. 从参数服务器获取 config_file 路径，或者使用默认路径
+        # 2. Get the config_file path from the parameter server, or use the default path
         config_file = rospy.get_param(
             "~config_file", 
             "/home/jetson/catkin_ws/src/my_navigation/config/robot_info.yaml"
         )
 
-        # 读取配置文件，获取电机中点 PWM 值等
+        # Read the config file to get the motor center PWM values, etc.
         self.pwm_center_left = 1500
         self.pwm_center_right = 1500
-        self.serial_port_name = "/dev/ttyUSB0"   # 备用串口名
+        self.serial_port_name = "/dev/ttyUSB0"   # Fallback serial port name
 
         if os.path.exists(config_file):
             try:
@@ -39,29 +39,29 @@ class CmdVelToPWMNode(object):
         else:
             rospy.logwarn(f"[cmd_vel_to_raw_pwm] Config file {config_file} does not exist. Using default values.")
 
-        # 3. 机器人本体参数（需要与实际机器人匹配）
-        self.wheel_radius = 0.033   # 轮子半径(m)
-        self.wheel_base   = 0.100   # 左右轮中心间距(m)
+        # 3. Robot body parameters (must match the real robot)
+        self.wheel_radius = 0.033   # Wheel radius (m)
+        self.wheel_base   = 0.100   # Distance between left and right wheel centers (m)
 
-        # 4. 简单的速度-PWM 转换系数（根据实际测量或标定）
-        #   假设线速度( m/s )经过一定系数映射到 PWM 的偏移量( e.g. 100 PWM每 1 m/s )
-        #   请根据实际测量做调整
-        self.K_v = 100.0  # 线速度 -> PWM 增量系数
-        self.K_w = 50.0   # 角速度 -> PWM 增量系数
+        # 4. Simple speed-to-PWM conversion factors (from real measurement or calibration)
+        #   Assume linear speed (m/s) maps to a PWM offset through some factor (e.g. 100 PWM per 1 m/s)
+        #   Adjust based on real measurement
+        self.K_v = 100.0  # Linear speed -> PWM increment factor
+        self.K_w = 50.0   # Angular speed -> PWM increment factor
 
-        # 5. 建立简单的左右轮速度校正增益，用于“回正” (只作演示，可改进为PID)
-        #   如果发现左轮速度比期望大了，就调低一点 PWM；右轮同理
-        #   这里仅用一个简单的 P (比例) 控制示例
-        self.Kp = 50.0   # 速度误差 -> PWM 修正的比例系数 (需要自己调参)
+        # 5. Set up a simple left/right wheel speed gain for "correction" (demo only, could be improved to PID)
+        #   If the left wheel is faster than desired, lower its PWM a bit; same for the right wheel
+        #   This only uses a simple P (proportional) control example
+        self.Kp = 50.0   # Proportional gain from speed error -> PWM correction (needs your own tuning)
 
-        # 6. 初始化存储当前测得的左右轮角速度
+        # 6. Initialize storage for the currently measured left/right wheel angular speeds
         self.left_vel_meas  = 0.0
         self.right_vel_meas = 0.0
 
-        # 7. 发布者：将计算好的左右电机 PWM 指令发布到 /raw_pwm 话题
+        # 7. Publisher: publish the computed left/right motor PWM commands to the /raw_pwm topic
         self.raw_pwm_pub = rospy.Publisher("/raw_pwm", Int16MultiArray, queue_size=10)
 
-        # 8. 订阅 /cmd_vel 和 /joint_states
+        # 8. Subscribe to /cmd_vel and /joint_states
         rospy.Subscriber("/cmd_vel", Twist, self.cmd_vel_callback)
         rospy.Subscriber("/joint_states", JointState, self.joint_states_callback)
 
@@ -69,67 +69,67 @@ class CmdVelToPWMNode(object):
 
     def joint_states_callback(self, msg):
         """
-        回调函数：订阅 /joint_states，获取左右轮当前实际角速度(rad/s)
-        假设 msg.name = ["left_wheel_joint", "right_wheel_joint"]
-        msg.velocity 对应左右轮的角速度 (rad/s)，需要转换为线速度(m/s)
+        Callback: subscribes to /joint_states and gets the current actual angular speed of the left and right wheels (rad/s)
+        Assume msg.name = ["left_wheel_joint", "right_wheel_joint"]
+        msg.velocity holds the left/right wheel angular speeds (rad/s), which must be converted to linear speed (m/s)
         """
         try:
-            # 根据顺序读取
+            # Read in order
             idx_left  = msg.name.index("left_wheel_joint")
             idx_right = msg.name.index("right_wheel_joint")
 
-            # joint_states 里给的是角速度(rad/s)，换成线速度(m/s) = 角速度 * 轮子半径
+            # joint_states gives angular speed (rad/s); linear speed (m/s) = angular speed * wheel radius
             self.left_vel_meas  = msg.velocity[idx_left]  * self.wheel_radius
             self.right_vel_meas = msg.velocity[idx_right] * self.wheel_radius
         except ValueError:
-            # 如果找不到对应索引，忽略
+            # If the matching index is not found, ignore it
             pass
 
     def cmd_vel_callback(self, msg):
         """
-        回调函数：订阅 /cmd_vel
-        根据期望的线速度(v)和角速度(w)，
-        先计算“理想”左右轮线速度，再转换成PWM，再根据实际测得速度与目标速度的偏差做回正。
-        最终发布到 /raw_pwm。
+        Callback: subscribes to /cmd_vel
+        From the desired linear speed (v) and angular speed (w),
+        first compute the "ideal" left/right wheel linear speeds, then convert them to PWM, then correct using the error between the measured and target speeds.
+        Finally publish to /raw_pwm.
         """
-        # 1. 从 /cmd_vel 中获取期望线速度与角速度
-        v = msg.linear.x   # 单位: m/s
-        w = msg.angular.z  # 单位: rad/s
+        # 1. Get the desired linear and angular speed from /cmd_vel
+        v = msg.linear.x   # Unit: m/s
+        w = msg.angular.z  # Unit: rad/s
 
-        # 2. 理论上左右轮线速度
+        # 2. Theoretical left/right wheel linear speeds
         #    left_speed  = v - w*(wheel_base/2)
         #    right_speed = v + w*(wheel_base/2)
-        #    这里不做额外限幅，你可自行加以限制
+        #    No extra limiting here; you can add your own limits
         left_target_speed  = v - (w * (self.wheel_base / 2.0))
         right_target_speed = v + (w * (self.wheel_base / 2.0))
 
-        # 3. 将目标线速度转换成 “基础PWM增量” (不考虑回正校正时)
-        #    注意：这里非常依赖实际测量，需要你自己调参 K_v、K_w
-        #    例如：left_pwm = pwm_center_left + K_v * left_target_speed
+        # 3. Convert the target linear speed to a "base PWM increment" (without the correction)
+        #    Note: this depends heavily on real measurement; you need to tune K_v, K_w yourself
+        #    For example: left_pwm = pwm_center_left + K_v * left_target_speed
         #           right_pwm = pwm_center_right + K_v * right_target_speed
-        #    如果要细分线速度和角速度增量，也可以拆分，但这里做简化处理
+        #    To separate the linear and angular speed increments you can split them, but this is simplified here
         left_pwm_base  = self.pwm_center_left  + int(self.K_v * left_target_speed)
         right_pwm_base = self.pwm_center_right + int(self.K_v * right_target_speed)
 
-        # 4. 根据实际速度和目标速度的误差，做简单比例修正
+        # 4. Simple proportional correction from the error between actual and target speed
         #    err_left  = left_target_speed  - left_vel_meas
         #    err_right = right_target_speed - right_vel_meas
         err_left  = left_target_speed  - self.left_vel_meas
         err_right = right_target_speed - self.right_vel_meas
 
-        # 将速度误差转换成 PWM 修正量
+        # Convert the speed error to a PWM correction
         pwm_offset_left  = int(self.Kp * err_left)
         pwm_offset_right = int(self.Kp * err_right)
 
-        # 最终 PWM
+        # Final PWM
         left_pwm  = left_pwm_base  + pwm_offset_left
         right_pwm = right_pwm_base + pwm_offset_right
 
-        # 5. 限幅，确保 PWM 在 [1000, 2000] 区间
+        # 5. Clamp so PWM stays in [1000, 2000]
         left_pwm  = max(1000, min(2000, left_pwm))
         right_pwm = max(1000, min(2000, right_pwm))
 
-        # 6. 打包消息并发布到 /raw_pwm
+        # 6. Pack the message and publish it to /raw_pwm
         pwm_msg = Int16MultiArray()
         pwm_msg.data = [left_pwm, right_pwm]
         self.raw_pwm_pub.publish(pwm_msg)
@@ -143,7 +143,7 @@ class CmdVelToPWMNode(object):
 
 if __name__ == "__main__":
     try:
-        # 等待 /serial_port_ready (若有需要，可参照 raw_pwm.py 的处理方式)
+        # Wait for /serial_port_ready (if needed, follow how raw_pwm.py does it)
         rospy.loginfo("cmd_vel_to_raw_pwm: Waiting for /serial_port_ready param...")
         while not rospy.has_param("/serial_port_ready"):
             rospy.sleep(1.0)

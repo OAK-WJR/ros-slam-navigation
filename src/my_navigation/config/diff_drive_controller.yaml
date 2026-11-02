@@ -18,10 +18,10 @@ diff_drive_controller:
   twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]
   
   pid:
-    Kp: 3.0          # 比例增益
-    Ki: 0.0001        # 积分增益
-    Kd: 2.0           # 微分增益
-    e_integral_max: 100.0  # 积分误差最大值
+    Kp: 3.0          # Proportional gain
+    Ki: 0.0001        # Integral gain
+    Kd: 2.0           # Derivative gain
+    e_integral_max: 100.0  # Max integral error
   pwm:
-    center_left: 1398  # 左轮 PWM 中点值
-    center_right: 1398 # 右轮 PWM 中点值
+    center_left: 1398  # Left wheel PWM center value
+    center_right: 1398 # Right wheel PWM center value

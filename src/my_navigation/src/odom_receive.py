@@ -6,7 +6,7 @@ import math
 import nav_msgs.msg
 import geometry_msgs.msg
 
-# 端口配置
+# Port config
 PORT_ODOM = 8888
 BUFFER_SIZE = 1024
 
@@ -14,63 +14,63 @@ rospy.init_node("odom_receiver", anonymous=True)
 odom_pub = rospy.Publisher("odom", nav_msgs.msg.Odometry, queue_size=10)
 tf_broadcaster = tf.TransformBroadcaster()
 
-# 创建 TCP 服务器，监听指定端口
+# Create a TCP server listening on the given port
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(("0.0.0.0", PORT_ODOM))
 server_socket.listen(1)
 
-rospy.loginfo("等待在端口 %d 上接收 Odom 数据...", PORT_ODOM)
+rospy.loginfo("Waiting to receive Odom data on port %d...", PORT_ODOM)
 conn, addr = server_socket.accept()
-rospy.loginfo("已接收来自 %s 的 Odom 连接", addr)
+rospy.loginfo("Accepted Odom connection from %s", addr)
 
 buffer = ""
 while not rospy.is_shutdown():
     try:
-        # 接收数据并追加到缓冲区
+        # Receive data and append it to the buffer
         data = conn.recv(BUFFER_SIZE).decode("utf-8")
         if not data:
             continue
         buffer += data
 
-        # 按换行符拆分数据，得到完整的数据行列表
+        # Split the data on newlines to get a list of complete data lines
         lines = buffer.split("\n")
-        # 如果最后一行不完整，则保留到下次继续接收
+        # If the last line is incomplete, keep it for the next receive
         if buffer[-1] != "\n":
             buffer = lines[-1]
             lines = lines[:-1]
         else:
             buffer = ""
 
-        # 对每一完整行数据进行处理
+        # Process each complete line of data
         for line in lines:
             line = line.strip()
             if not line:
                 continue
 
-            # 将 CSV 数据按逗号拆分
+            # Split the CSV data on commas
             values = line.split(",")
             if len(values) < 7:
-                rospy.logwarn("不完整的 Odom 数据: %s", line)
+                rospy.logwarn("Incomplete Odom data: %s", line)
                 continue
 
-            # CSV 格式：[timestamp, x, y, yawDeg, vx, vy, angVel]
+            # CSV format: [timestamp, x, y, yawDeg, vx, vy, angVel]
             try:
                 timestamp = float(values[0])
                 x = float(values[1])
                 y = float(values[2])
-                yawDeg = float(values[3])  # 假设角度为度
+                yawDeg = float(values[3])  # Assume the angle is in degrees
                 vx = float(values[4])
                 vy = float(values[5])
                 angVel = float(values[6])
             except Exception as parse_e:
-                rospy.logwarn("数据转换错误: %s, 行数据: %s", parse_e, line)
+                rospy.logwarn("Data conversion error: %s, line data: %s", parse_e, line)
                 continue
 
-            # 将角度转换为弧度
+            # Convert the angle to radians
             yawRad = yawDeg
             quat = tf.transformations.quaternion_from_euler(0, 0, yawRad)
 
-            # 构建 odom 消息
+            # Build the odom message
             odom_msg = nav_msgs.msg.Odometry()
             odom_msg.header.stamp = rospy.Time.now()
             odom_msg.header.frame_id = "odom"
@@ -81,27 +81,27 @@ while not rospy.is_shutdown():
             odom_msg.pose.pose.position.z = 0.0
             odom_msg.pose.pose.orientation = geometry_msgs.msg.Quaternion(*quat)
 
-            # 设置线速度
+            # Set linear velocity
             odom_msg.twist.twist.linear.x = vx
             odom_msg.twist.twist.linear.y = vy
-            # 设置角速度（将角速度从度/s转换为弧度/s）
+            # Set angular velocity (convert angular velocity from deg/s to rad/s)
             odom_msg.twist.twist.angular.z = angVel
 
-            # 发布消息
+            # Publish the message
             odom_pub.publish(odom_msg)
 
-            # 发布 TF 变换
-            # 组合里程计位置和IMU的偏移
+            # Publish the TF transform
+            # Combine odometry position and IMU offset
             tf_broadcaster.sendTransform(
-                (x, y, 0),  # 结合里程计位置和IMU偏移
-                tf.transformations.quaternion_from_euler(0, 0, yawRad),  # 结合里程计方向和IMU旋转
+                (x, y, 0),  # Combine odometry position and IMU offset
+                tf.transformations.quaternion_from_euler(0, 0, yawRad),  # Combine odometry heading and IMU rotation
                 rospy.Time.now(),
                 "base_link",
                 "odom"
             )
 
     except Exception as e:
-        rospy.logwarn("Odom 数据处理错误: %s", e)
+        rospy.logwarn("Odom data processing error: %s", e)
         break
 
 conn.close()

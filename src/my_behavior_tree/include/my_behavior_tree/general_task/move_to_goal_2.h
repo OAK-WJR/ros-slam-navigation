@@ -12,7 +12,7 @@
 using MoveBaseClient = actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction>;
 extern std::unordered_map<std::string, geometry_msgs::Pose> waypoints;
 
-// 声明 loadWaypoints 的实现
+// Declare the loadWaypoints implementation
 void loadWaypoints(const std::string& filename);
 
 class MoveToGoal2 : public BT::StatefulActionNode
@@ -20,10 +20,10 @@ class MoveToGoal2 : public BT::StatefulActionNode
 public:
     MoveToGoal2(const std::string &name, const BT::NodeConfiguration &config);
 
-    // 静态接口，用于注册端口
+    // Static interface, used to register ports
     static BT::PortsList providedPorts();
 
-    // BT 节点必须实现的虚函数
+    // Virtual functions a BT node must implement
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;

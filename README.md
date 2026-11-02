@@ -135,7 +135,7 @@ Some paths are still the ones on the Jetson: `robot_info.yaml` is read from
 - The behavior tree is an unfinished experiment for an FRC autonomous routine; it is not part of the portfolio pages.
 - This is a snapshot, not a polished package: some launch and config files are
   from earlier attempts.
-- Most code comments and log messages are in Chinese, as they were written at the time.
+- Most code comments and log messages were written in Chinese at the time and translated into English in November 2026.
 
 ## Credits
 
@@ -152,7 +152,8 @@ Code written by AI tools:
   odometry node (I corrected its heading sign and wheel order) and the roboRIO
   bridge code.
 - Claude Code (Nov 2026) prepared this repository: it picked the files,
-  wrote `demo_no_hardware.launch`, `deps.rosinstall`, this README and the GIF,
+  translated the Chinese comments and log messages into English, wrote
+  `demo_no_hardware.launch`, `deps.rosinstall`, this README and the GIF,
   and made three small build fixes (relative map paths in the map YAML files,
   the yaml-cpp lookup in `my_behavior_tree/CMakeLists.txt`, and dropping an old
   planner class from the `my_planner` build).

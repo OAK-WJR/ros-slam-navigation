@@ -7,7 +7,7 @@ def simple_pwm_test():
     
     pwm_pub = rospy.Publisher("/raw_pwm", Int16MultiArray, queue_size=10)
     
-    rospy.sleep(1)  # 等待发布者初始化
+    rospy.sleep(1)  # Wait for the publisher to initialize
     
     pwm_msg = Int16MultiArray()
     pwm_msg.data = [1600, 1600]
@@ -15,7 +15,7 @@ def simple_pwm_test():
     pwm_pub.publish(pwm_msg)
 
     rospy.loginfo("PWM message sent. Node will keep running to ensure /raw_pwm is active.")
-    rospy.spin()  # 阻塞运行，保持发布者活跃
+    rospy.spin()  # Block and keep the publisher alive
 
 if __name__ == "__main__":
     try:

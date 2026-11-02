@@ -1,14 +1,14 @@
 <launch>
-  <!-- 关闭仿真时间 -->
+  <!-- Disable sim time -->
   <param name="/use_sim_time" value="false" />
 
-  <!-- NetworkTables 服务器 IP（RoboRIO） -->
+  <!-- NetworkTables server IP (RoboRIO) -->
   <arg name="server_ip" default="10.1.14.2" />
 
-  <!-- 启动地图服务器 -->
+  <!-- Start the map server -->
   <include file="$(find my_navigation)/launch/map_server.launch" />
 
-  <!-- 发布机器人信息 -->
+  <!-- Publish robot info -->
   <arg
     name="model" />
   <param
@@ -23,18 +23,18 @@
     pkg="robot_state_publisher"
     type="robot_state_publisher" />
 
-  <!-- 启动雷达 -->
+  <!-- Start the lidar -->
   <include file="$(find rplidar_ros)/launch/rplidar_s2.launch" />
 
-  <!-- 启动imu -->
+  <!-- Start imu -->
   <node pkg="my_navigation" type="imu_receive.py" name="imu_receive" output="screen" />
 
-  <!-- 启动odom -->
+  <!-- Start odom -->
   <node pkg="my_navigation" type="odom_receive_nt.py" name="odom_receive_nt" output="screen">
     <param name="server_ip" value="$(arg server_ip)" />
   </node>
 
-  <!-- 发送cmd_vel -->
+  <!-- Send cmd_vel -->
   <node pkg="my_navigation" type="cmd_vel_sent_nt.py" name="cmd_vel_sent_nt" output="screen">
     <param name="server_ip" value="$(arg server_ip)" />
   </node>
@@ -48,13 +48,13 @@
 
   <node pkg="jie_ware" type="costmap_cleaner" name="costmap_cleaner" />
 
-  <!-- 载入 Move Base -->
+  <!-- Load Move Base -->
   <include file="$(find my_navigation)/launch/move_base.launch" />
 
-  <!-- 加载目标点 -->
+  <!-- Load goal points -->
   <node pkg="my_navigation" type="interactive_goal_marker.py" name="interactive_goal_marker" output="screen" />
 
-  <!-- 启动 RViz -->
+  <!-- Start RViz -->
   <node name="rviz" pkg="rviz" type="rviz"
     args="-d $(find my_navigation)/config/rviz_config.rviz" />
 </launch>

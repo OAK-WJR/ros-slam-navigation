@@ -28,7 +28,7 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
 )
 
-# 使用 GLOB_RECURSE 递归查找所有 .cpp 文件
+# Use GLOB_RECURSE to find all .cpp files recursively
 file(GLOB_RECURSE SRC_FILES
   src/*.cpp
 )

@@ -8,29 +8,29 @@ class MotorControlNode:
     def __init__(self):
         rospy.init_node('motor_control_node')
         
-        # 可在ROS参数服务器里设置，也可以写死在代码中
+        # Can be set on the ROS parameter server, or hard-coded
         self.serial_port_name = rospy.get_param('~serial_port', '/dev/ttyACM0')
         self.baud_rate = rospy.get_param('~baud_rate', 9600)
-        self.timeout_duration = rospy.get_param('~timeout_duration', 0.5)  # 超时时间（秒）
+        self.timeout_duration = rospy.get_param('~timeout_duration', 0.5)  # Timeout (seconds)
 
-        # 串口初始化
+        # Serial port init
         try:
             self.serial_port = serial.Serial(self.serial_port_name, self.baud_rate, timeout=1)
             self.serial_port.flush()
             rospy.loginfo(f"Successfully connected to serial port {self.serial_port_name}")
         except serial.SerialException as e:
             rospy.logerr(f"Failed to open serial port {self.serial_port_name}: {e}")
-            rospy.signal_shutdown("Serial port initialization failed")  # 若无法初始化，直接关闭节点
+            rospy.signal_shutdown("Serial port initialization failed")  # If init fails, shut down the node right away
             return
 
-        # 电机中心值
+        # Motor center values
         self.center_left = 1525
         self.center_right = 1545
 
-        # 记录上一次接收 cmd_vel 的时间，初始为当前时间
+        # Record when cmd_vel was last received; starts as the current time
         self.last_cmd_time = time.time()
 
-        # 订阅 /cmd_vel 话题
+        # Subscribe to the /cmd_vel topic
         self.subscriber = rospy.Subscriber(
             '/cmd_vel',
             Twist,
@@ -39,32 +39,32 @@ class MotorControlNode:
         )
         rospy.loginfo("Motor Control Node has started and subscribed to /cmd_vel")
 
-        # 设置一个定时器，周期性检查是否超时
-        self.timer = rospy.Timer(rospy.Duration(0.1), self.timeout_check_callback)  # 0.1s 执行一次
+        # Set a timer to check for timeout periodically
+        self.timer = rospy.Timer(rospy.Duration(0.1), self.timeout_check_callback)  # Runs once every 0.1s
 
     def cmd_vel_callback(self, msg):
-        # 更新 last_cmd_time
+        # Update last_cmd_time
         self.last_cmd_time = time.time()
 
-        # 从 /cmd_vel 获取线速度和角速度
-        linear_x = msg.linear.x  # 前进/后退速度
-        angular_z = msg.angular.z  # 转向速度
+        # Get linear and angular speed from /cmd_vel
+        linear_x = msg.linear.x  # Forward/backward speed
+        angular_z = msg.angular.z  # Turning speed
 
-        # 转换为左右电机的 PWM 值
+        # Convert to left/right motor PWM values
         left_speed = int(self.center_left + linear_x * 200 + angular_z * 100)
-        right_speed = int(self.center_right + linear_x * 200 - angular_z * 100)  # 注意这里改为减号
+        right_speed = int(self.center_right + linear_x * 200 - angular_z * 100)  # Note: changed to a minus sign here
 
-        # 限制 PWM 范围在 1000-2000 微秒之间
+        # Limit PWM to the 1000-2000 microsecond range
         left_speed = max(1000, min(2000, left_speed))
         right_speed = max(1000, min(2000, right_speed))
 
-        # 发送给Arduino
+        # Send to the Arduino
         self.send_pwm(left_speed, right_speed)
 
     def timeout_check_callback(self, event):
         """
-        定时器回调：检测是否超过超时时间没收到新命令。
-        如果超时，则发送中心值(停止命令)到电机。
+        Timer callback: check whether no new command has arrived within the timeout.
+        If timed out, send the center values (stop command) to the motors.
         """
         current_time = time.time()
         if (current_time - self.last_cmd_time) > self.timeout_duration:
@@ -73,7 +73,7 @@ class MotorControlNode:
 
     def send_pwm(self, left_speed, right_speed):
         """
-        统一封装发送PWM的操作，并带串口异常处理
+        Wraps sending PWM in one place, with serial port exception handling
         """
         try:
             command = f"{left_speed} {right_speed}\n"
@@ -84,13 +84,13 @@ class MotorControlNode:
 
     def shutdown(self):
         """
-        节点关闭时：停止电机并关闭串口
+        On node shutdown: stop the motors and close the serial port
         """
         rospy.loginfo("Shutting down motor control node...")
-        # 停止电机
+        # Stop the motors
         self.send_pwm(self.center_left, self.center_right)
 
-        # 停止定时器
+        # Stop the timer
         self.timer.shutdown()
 
         if self.serial_port.is_open:

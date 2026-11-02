@@ -8,18 +8,18 @@ import rospy
 
 def detect_arduino():
     """
-    自动检测连接的 Arduino 串口设备。
-    返回检测到的串口路径，例如 /dev/ttyUSB0 或 None。
+    Auto-detect the connected Arduino serial device.
+    Returns the detected serial port path, e.g. /dev/ttyUSB0, or None.
     """
     ports = serial.tools.list_ports.comports()
     for port in ports:
         try:
             ser = serial.Serial(port.device, 9600, timeout=2)
-            ser.write(b'\n')  # 尝试发送空行，触发 Arduino 响应
+            ser.write(b'\n')  # Try sending an empty line to trigger an Arduino response
             response = ser.readline().decode('utf-8').strip()
             ser.close()
 
-            if response:  # 如果有响应
+            if response:  # If there is a response
                 print(f"Detected Arduino on {port.device}: {response}")
                 return port.device
 
@@ -31,17 +31,17 @@ def detect_arduino():
 
 def update_or_create_yaml(filename, key, value):
     """
-    更新或创建 YAML 文件中的配置信息。
+    Update or create config info in a YAML file.
 
-    参数:
-    - filename: 配置文件路径。
-    - key: 要更新的顶级键（如 "motor_control_node"）。
-    - value: 要写入的值（可以是字典类型）。
+    Parameters:
+    - filename: Config file path.
+    - key: Top-level key to update (e.g. "motor_control_node").
+    - value: Value to write (can be a dict).
     """
-    # 确保目标目录存在
+    # Make sure the target directory exists
     os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-    # 如果文件存在，先加载已有内容
+    # If the file exists, load its current content first
     data = {}
     if os.path.exists(filename):
         with open(filename, 'r') as yaml_file:
@@ -50,10 +50,10 @@ def update_or_create_yaml(filename, key, value):
             except yaml.YAMLError as e:
                 print(f"Error reading YAML file: {e}")
 
-    # 更新指定的键值
+    # Update the given key
     data[key] = value
 
-    # 写回文件
+    # Write back to the file
     with open(filename, 'w') as yaml_file:
         yaml.dump(data, yaml_file, default_flow_style=False)
     print(f"Configuration updated in {filename}")
@@ -66,12 +66,12 @@ def main():
     if arduino_port:
         update_or_create_yaml(filename, "arduino", {"serial_port": arduino_port})
         print(f"Arduino detected on {arduino_port}. Configuration saved.")
-        rospy.set_param("/serial_port_ready", True)  # 设置参数，通知其他节点
+        rospy.set_param("/serial_port_ready", True)  # Set the param to notify other nodes
     else:
         print("No Arduino detected. YAML file not written.")
-        rospy.set_param("/serial_port_ready", False)  # 设置失败状态
+        rospy.set_param("/serial_port_ready", False)  # Set the failure state
 
-    # 保持节点运行以避免触发 ROS 系统关闭
+    # Keep the node running to avoid triggering a ROS system shutdown
     rospy.spin()
 
 

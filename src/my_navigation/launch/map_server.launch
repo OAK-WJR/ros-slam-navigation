@@ -1,7 +1,7 @@
 <launch>
-  <!-- 定义地图文件路径参数 -->
+  <!-- Define the map file path arg -->
   <arg name="map_file" default="$(find my_navigation)/maps/map_school_4.yaml" />
 
-  <!-- 启动 map_server 节点 -->
+  <!-- Start the map_server node -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 </launch>

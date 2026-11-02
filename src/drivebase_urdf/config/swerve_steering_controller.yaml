@@ -1,4 +1,4 @@
-# 关节状态控制器
+# Joint state controller
 joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
@@ -13,15 +13,15 @@ gazebo_ros_control:
     lb_steer_joint: {p: 50.0, i: 0.0, d: 0.0}
     rb_steer_joint: {p: 50.0, i: 0.0, d: 0.0}
 
-# 舵轮控制器
+# Swerve controller
 swerve_steering_controller:
   type: swerve_steering_controller/SwerveSteeringController
   
-  # 轮子和转向关节名称
+  # Wheel and steering joint names
   wheels: ['lf_wheel_joint', 'rf_wheel_joint', 'lb_wheel_joint', 'rb_wheel_joint']
   holders: ['lf_steer_joint', 'rf_steer_joint', 'lb_steer_joint', 'rb_steer_joint']
   
-  # PID参数
+  # PID parameters
   wheel_pid_gains:
     p: 100.0
     i: 0.01 
@@ -32,34 +32,34 @@ swerve_steering_controller:
     i: 0.01
     d: 10.0
     
-  # 轮子半径(米)
+  # Wheel radius (meters)
   radii: [0.0684135, 0.0684135, 0.0684135, 0.0684135]
   
-  # 是否无限制转向
+  # Whether steering is unlimited
   limitless: [false, false, false, false]
   
-  # 轮子偏移量
+  # Wheel offsets
   offsets: [0.0, 0.0, 0.0, 0.0]
   
-  # 轮子位置(x,y坐标,单位米)
+  # Wheel positions (x,y coordinates, in meters)
   positions: [
-    [0.319074617335405, 0.296038980276503],   # 左前
-    [0.319074617335405, -0.296038980276503],  # 右前  
-    [-0.319074617335405, 0.296038980276503],  # 左后
-    [-0.319074617335405, -0.296038980276503]  # 右后
+    [0.319074617335405, 0.296038980276503],   # Front left
+    [0.319074617335405, -0.296038980276503],  # Front right  
+    [-0.319074617335405, 0.296038980276503],  # Rear left
+    [-0.319074617335405, -0.296038980276503]  # Rear right
   ]
   
-  # 转向限制(弧度)
+  # Steering limits (radians)
   limits: [[-3.14159, 3.14159], [-3.14159, 3.14159], [-3.14159, 3.14159], [-3.14159, 3.14159]]
   
-  # 发布频率
+  # Publish rate
   publish_rate: 50
   
-  # 协方差
+  # Covariance
   pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]
   twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]
   
-  # 坐标系
+  # Frames
   base_frame_id: base_link
   odom_frame_id: odom  
   enable_odom_tf: true

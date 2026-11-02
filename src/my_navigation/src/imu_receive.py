@@ -5,7 +5,7 @@ import math
 
 from sensor_msgs.msg import Imu, MagneticField
 from geometry_msgs.msg import Quaternion
-import tf  # ROS 1 使用 tf 而非 tf2_ros
+import tf  # ROS 1 uses tf instead of tf2_ros
 from tf.transformations import quaternion_from_euler
 
 
@@ -13,12 +13,12 @@ class IMUReceiverNode:
     def __init__(self):
         rospy.init_node('imu_receiver_node')
 
-        # 创建Publisher
+        # Create Publisher
         self.imu_pub = rospy.Publisher('imu/data', Imu, queue_size=10)
         self.mag_pub = rospy.Publisher('imu/mag', MagneticField, queue_size=10)
         self.tf_broadcaster = tf.TransformBroadcaster()
 
-        # 启动 Socket server (监听 0.0.0.0:9999, 等待 RoboRio 连进来)
+        # Start the Socket server (listen on 0.0.0.0:9999, wait for the RoboRio to connect)
         self.host = '0.0.0.0'
         self.port = 9999
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -29,27 +29,27 @@ class IMUReceiverNode:
 
         self.client_socket = None
 
-        # 主循环
+        # Main loop
         self.run()
 
     def run(self):
-        rate = rospy.Rate(1000)  # 每秒检查 1000 次
+        rate = rospy.Rate(1000)  # Check 1000 times per second
         while not rospy.is_shutdown():
             self.check_connection()
             rate.sleep()
 
     def check_connection(self):
-        # 如果还没连接, accept 一次
+        # If not connected yet, accept once
         if self.client_socket is None:
             try:
                 self.client_socket, addr = self.server_socket.accept()
                 rospy.loginfo(f'Accepted connection from {addr}')
                 self.client_socket.setblocking(False)
             except BlockingIOError:
-                # 没有新的连接就算了
+                # No new connection, skip it
                 return
 
-        # 如果已经连接, 尝试读数据
+        # If already connected, try to read data
         if self.client_socket:
             try:
                 data = self.client_socket.recv(4096)
@@ -126,11 +126,11 @@ class IMUReceiverNode:
             self.mag_pub.publish(mag_msg)
 
             #self.tf_broadcaster.sendTransform(
-            #    (0.0, 0.0, 0.0),  # 位移
-            #    q,  # 四元数
+            #    (0.0, 0.0, 0.0),  # Translation
+            #    q,  # Quaternion
             #    rospy.Time.now(),
-            #    'imu_link',  # 子坐标系
-            #    'base_link'  # 父坐标系
+            #    'imu_link',  # Child frame
+            #    'base_link'  # Parent frame
             #)
 
         except ValueError:
