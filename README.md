@@ -152,8 +152,7 @@ Code written by AI tools:
   odometry node (I corrected its heading sign and wheel order) and the roboRIO
   bridge code.
 - Claude Code (Nov 2026) prepared this repository: it picked the files,
-  translated the Chinese comments and log messages into English, wrote
-  `demo_no_hardware.launch`, `deps.rosinstall`, this README and the GIF,
+  wrote `demo_no_hardware.launch`, `deps.rosinstall`, this README and the GIF,
   and made three small build fixes (relative map paths in the map YAML files,
   the yaml-cpp lookup in `my_behavior_tree/CMakeLists.txt`, and dropping an old
   planner class from the `my_planner` build).
